@@ -6,7 +6,7 @@
 e-store/
 ├── docker-compose.yml      # Docker Compose
 ├── nginx/                  # Nginx
-├── product/                # (Python/FastAPI)
+├── product/                # Product (Python/FastAPI)
 │   ├── Dockerfile
 │   ├── app/
 │   │   ├── api/
@@ -23,12 +23,21 @@ e-store/
 │   │   ├── services/
 │   │   └── main.py
 │   └── requirements.txt
-└── coupon/                 # Coupon (Node.js/Express)
+├── coupon/                 # Coupon (Node.js/Express)
+│   ├── Dockerfile
+│   ├── src/
+│   │   ├── index.js
+│   │   ├── routes/
+│   │   ├── models/
+│   │   └── controllers/
+│   └── package.json
+└── order/                  # Order (Python/FastAPI)
     ├── Dockerfile
-    ├── src/
-    │   ├── index.js
-    │   ├── routes/
+    ├── app/
+    │   ├── api/
+    │   ├── db/
     │   ├── models/
-    │   └── controllers/
-    └── package.json
+    │   ├── services/
+    │   └── main.py
+    └── requirements.txt
 ```
