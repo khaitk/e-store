@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const { connectDB } = require('./config/db');
 const couponRoutes = require('./routes/couponRoutes');
 const promotionRoutes = require('./routes/promotionRoutes');
+const healthRoutes = require('./routes/healthRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -23,15 +24,11 @@ app.use(morgan('dev'));
 // Routes
 app.use('/api/coupons', couponRoutes);
 app.use('/api/promotions', promotionRoutes);
+app.use('/', healthRoutes);
 
 // Root route
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Coupon Service' });
-});
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'healthy' });
 });
 
 // Error handling middleware

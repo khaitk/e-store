@@ -41,19 +41,16 @@ def create_app(test_config=None):
     # Import and register blueprints
     from app.api.orders import orders_bp
     from app.api.cart import cart_bp
+    from app.api.health import health_bp
     
     app.register_blueprint(orders_bp)
     app.register_blueprint(cart_bp)
+    app.register_blueprint(health_bp)
     
     # Root route
     @app.route('/')
     def index():
         return {'message': 'Welcome to Order Service'}
-    
-    # Health check route
-    @app.route('/health')
-    def health_check():
-        return {'status': 'healthy'}
     
     # Create all tables in database
     with app.app_context():

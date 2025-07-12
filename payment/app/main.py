@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import payments, invoices, webhooks
+from app.api.routes import payments, invoices, webhooks, health
 from app.db.database import engine
 from app.models import models
 
@@ -27,11 +27,8 @@ app.add_middleware(
 app.include_router(payments.router, prefix="/api", tags=["payments"])
 app.include_router(invoices.router, prefix="/api", tags=["invoices"])
 app.include_router(webhooks.router, prefix="/api", tags=["webhooks"])
+app.include_router(health.router, tags=["health"])
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Payment Service"}
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
