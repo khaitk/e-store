@@ -1,0 +1,78 @@
+name: Build Microservices
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      product: ${{ steps.filter.outputs.product }}
+      payment: ${{ steps.filter.outputs.payment }}
+      coupon: ${{ steps.filter.outputs.coupon }}
+      order: ${{ steps.filter.outputs.order }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            product:
+              - 'product/**'
+            payment:
+              - 'payment/**'
+            coupon:
+              - 'coupon/**'
+            order:
+              - 'order/**'
+
+  build-product:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.product == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Product Service
+        run: |
+          cd product
+          docker build -t product-service .
+          echo "Product service built successfully"
+
+  build-payment:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.payment == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Payment Service
+        run: |
+          cd payment
+          docker build -t payment-service .
+          echo "Payment service built successfully"
+
+  build-coupon:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.coupon == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Coupon Service
+        run: |
+          cd coupon
+          docker build -t coupon-service .
+          echo "Coupon service built successfully"
+
+  build-order:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.order == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Order Service
+        run: |
+          cd order
+          docker build -t order-service .
+          echo "Order service built successfully"
