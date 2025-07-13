@@ -1,10 +1,13 @@
-name: Build Microservices
+name: Build and Deploy Microservices
 
 on:
   push:
     branches: [ main, master, develop ]
   pull_request:
     branches: [ main, master, develop ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
 
 jobs:
   detect-changes:
@@ -29,50 +32,134 @@ jobs:
             order:
               - 'order/**'
 
-  build-product:
+  build-and-deploy-product:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.product == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build Product Service
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Build, tag, and push Product image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: e-store-product
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           cd product
-          docker build -t product-service .
-          echo "Product service built successfully"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service --cluster e-store-cluster --service e-store-product-service --force-new-deployment
 
-  build-payment:
+  build-and-deploy-payment:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.payment == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build Payment Service
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Build, tag, and push Payment image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: e-store-payment
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           cd payment
-          docker build -t payment-service .
-          echo "Payment service built successfully"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service --cluster e-store-cluster --service e-store-payment-service --force-new-deployment
 
-  build-coupon:
+  build-and-deploy-coupon:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.coupon == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build Coupon Service
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Build, tag, and push Coupon image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: e-store-coupon
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           cd coupon
-          docker build -t coupon-service .
-          echo "Coupon service built successfully"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service --cluster e-store-cluster --service e-store-coupon-service --force-new-deployment
 
-  build-order:
+  build-and-deploy-order:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.order == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build Order Service
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Build, tag, and push Order image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: e-store-order
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           cd order
-          docker build -t order-service .
-          echo "Order service built successfully"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service --cluster e-store-cluster --service e-store-order-service --force-new-deployment
