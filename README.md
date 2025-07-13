@@ -31,7 +31,7 @@ e-store/
 │   │   ├── models/
 │   │   └── controllers/
 │   └── package.json
-└── order/                  # Order (Python/FastAPI)
+└── order/                  # Order (Python/Flask)
     ├── Dockerfile
     ├── app/
     │   ├── api/
