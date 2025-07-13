@@ -14,7 +14,7 @@ exports.getCoupon = async (req, res) => {
   if (!coupon) {
     return res.status(404).json({
       success: false,
-      error: 'Coupon not found'
+      error: 'Coupon not found.'
     });
   }
   
@@ -34,7 +34,7 @@ exports.updateCoupon = async (req, res) => {
   if (!coupon) {
     return res.status(404).json({
       success: false,
-      error: 'Coupon not found'
+      error: 'Coupon not found.'
     });
   }
   
@@ -50,7 +50,7 @@ exports.deleteCoupon = async (req, res) => {
   if (!coupon) {
     return res.status(404).json({
       success: false,
-      error: 'Coupon not found'
+      error: 'Coupon not found.'
     });
   }
   
@@ -68,7 +68,7 @@ exports.validateCoupon = async (req, res) => {
   if (!coupon) {
     return res.status(404).json({
       success: false,
-      message: 'Coupon not found',
+      message: 'Coupon not found.',
       valid: false
     });
   }
@@ -77,7 +77,7 @@ exports.validateCoupon = async (req, res) => {
   
   res.status(200).json({
     success: true,
-    message: isValid ? 'Coupon is valid' : 'Coupon is not valid',
+    message: isValid ? 'Coupon is valid.' : 'Coupon is not valid.',
     valid: isValid,
     data: isValid ? coupon : null
   });
@@ -91,14 +91,14 @@ exports.applyCoupon = async (req, res) => {
   if (!coupon) {
     return res.status(404).json({
       success: false,
-      error: 'Coupon not found'
+      error: 'Coupon not found.'
     });
   }
   
   if (!coupon.isValid()) {
     return res.status(400).json({
       success: false,
-      error: 'Coupon is not valid'
+      error: 'Coupon is not valid.'
     });
   }
   
@@ -138,6 +138,6 @@ exports.cleanupExpiredCoupons = async (req, res) => {
   
   res.status(200).json({
     success: true,
-    message: `Deactivated ${result.modifiedCount} expired coupons`
+    message: `Deactivated ${result.modifiedCount} expired coupons.`
   });
 };
